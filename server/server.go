@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/rs/cors"
 )
 
 // Server is our server object. A normal Server object with a logger attached to it.
@@ -43,7 +44,7 @@ func (s *Server) addHandlers() {
 
 	mux.HandleFunc("/", s.helloWorldHandler)
 
-	s.Handler = mux
+	s.Handler = cors.Default().Handler(mux)
 }
 
 func (s *Server) helloWorldHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +58,7 @@ func (s *Server) Serve() error {
 	s.infoLogger.Println(fmt.Sprintf("Running HTTP server on: http://%s", s.Addr))
 
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		s.errorLogger.Printf("Could not listen on %s: %v\n", s.Addr, err)
+		s.errorLogger.Printf("Could not listen on %s: %v\n", s.Addr, err.Error())
 
 		return err
 	}
@@ -75,7 +76,7 @@ func (s *Server) GracefulShutdown() error {
 	s.SetKeepAlivesEnabled(false)
 
 	if err := s.Shutdown(ctx); err != nil {
-		s.errorLogger.Printf("Could not gracefully shutdown the server: %v\n", err)
+		s.errorLogger.Printf("Could not gracefully shutdown the server: %v\n", err.Error())
 		return err
 	}
 

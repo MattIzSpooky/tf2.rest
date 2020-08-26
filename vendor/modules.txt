@@ -4,3 +4,6 @@ github.com/gookit/color
 # github.com/joho/godotenv v1.3.0
 ## explicit
 github.com/joho/godotenv
+# github.com/rs/cors v1.7.0
+## explicit
+github.com/rs/cors
