@@ -1,0 +1,6 @@
+# github.com/gookit/color v1.2.8
+## explicit
+github.com/gookit/color
+# github.com/joho/godotenv v1.3.0
+## explicit
+github.com/joho/godotenv
