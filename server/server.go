@@ -42,15 +42,17 @@ func NewServer() *Server {
 func (s *Server) addHandlers() {
 	mux := &http.ServeMux{}
 
-	mux.HandleFunc("/", s.helloWorldHandler)
+	mux.Handle("/", jsonMiddleware(http.HandlerFunc(s.randomQuoteHandler)))
 
 	s.Handler = cors.Default().Handler(mux)
 }
 
-func (s *Server) helloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	s.errorLogger.Println("test error")
-	s.warnLogger.Println("test warning")
-	w.Write([]byte("hello world!"))
+func jsonMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Serve makes our endpoints available

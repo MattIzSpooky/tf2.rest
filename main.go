@@ -5,12 +5,15 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/MattIzSpooky/tf2.rest/quotes"
 	"github.com/MattIzSpooky/tf2.rest/server"
 	"github.com/joho/godotenv"
 )
 
 func main() {
 	godotenv.Load()
+
+	quotes.Setup()
 
 	sigChan := make(chan os.Signal, 1)
 
