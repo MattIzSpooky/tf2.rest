@@ -5,15 +5,20 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/MattIzSpooky/tf2.rest/quotes"
 	"github.com/MattIzSpooky/tf2.rest/server"
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	godotenv.Load()
+//go:generate go run gen.go
 
-	quotes.Setup()
+func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		panic(err)
+	}
+
+	//responses.Setup()
 
 	sigChan := make(chan os.Signal, 1)
 

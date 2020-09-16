@@ -6,11 +6,11 @@ import (
 	"math/rand"
 	"net/http"
 
-	"github.com/MattIzSpooky/tf2.rest/quotes"
+	"github.com/MattIzSpooky/tf2.rest/responses"
 )
 
 func (s *Server) randomQuoteHandler(w http.ResponseWriter, r *http.Request) {
-	randomQuote := quotes.ALL[rand.Intn(len(quotes.ALL))]
+	randomQuote := responses.ALL[rand.Intn(len(responses.ALL))]
 	json, err := json.Marshal(randomQuote)
 
 	if err != nil {
