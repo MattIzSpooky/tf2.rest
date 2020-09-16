@@ -65,7 +65,6 @@ func main() {
 			Timeout: 30 * time.Second,
 		}
 		responsePageUrl := fmt.Sprintf(url, class)
-		fmt.Println(responsePageUrl)
 		rsp, err := client.Get(responsePageUrl)
 		if err != nil {
 			panic(err)
@@ -91,7 +90,6 @@ func main() {
 			// Condition is found
 			if (hasCondition.Length() == 1) {
 				condition = strings.TrimSpace(selection.Contents().Not("ul").Text())
-				fmt.Println(condition)
 				return
 			}
 
@@ -115,7 +113,7 @@ func main() {
 			panic(err)
 		}
 		defer f.Close()
-		fmt.Println(strings.ToUpper(class))
+
 		responseTemplate.Execute(f, struct {
 			Timestamp time.Time
 			URL       string

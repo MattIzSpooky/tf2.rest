@@ -9,8 +9,6 @@ type Response struct {
 	Condition string `json:"condition"` // example: Melee killing a Heavy
 }
 
-
-
 const (
 	SCOUT    = "scout"
 	SOLDIER  = "soldier"
@@ -25,19 +23,19 @@ const (
 
 var ALL []Response
 
-//func Setup() {
-//	// Attack classes
-//	ALL = append(ALL, scoutResponses...)
-//	ALL = append(ALL, soldierResponses...)
-//	ALL = append(ALL, pyroResponses...)
-//
-//	// Defense classes
-//	ALL = append(ALL, demomanResponses...)
-//	ALL = append(ALL, heavyResponses...)
-//	ALL = append(ALL, engineerResponses...)
-//
-//	// Support classes
-//	ALL = append(ALL, medicResponses...)
-//	ALL = append(ALL, sniperResponses...)
-//	ALL = append(ALL, spyResponses...)
-//}
+func Setup() {
+	// Attack classes
+	ALL = append(ALL, scoutResponses...)
+	ALL = append(ALL, soldierResponses...)
+	ALL = append(ALL, pyroResponses...)
+
+	// Defense classes
+	ALL = append(ALL, demomanResponses...)
+	ALL = append(ALL, heavyResponses...)
+	ALL = append(ALL, engineerResponses...)
+
+	// Support classes
+	ALL = append(ALL, medicResponses...)
+	ALL = append(ALL, sniperResponses...)
+	ALL = append(ALL, spyResponses...)
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/MattIzSpooky/tf2.rest/responses"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	//responses.Setup()
+	responses.Setup()
 
 	sigChan := make(chan os.Signal, 1)
 
