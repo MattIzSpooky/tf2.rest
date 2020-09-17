@@ -12,7 +12,7 @@ import (
 
 type Scraper struct {
 	url      string
-	class 	 string
+	class    string
 	client   *http.Client
 	document *goquery.Document
 }
@@ -62,26 +62,40 @@ func (s Scraper) Run() ([]responses.Response, error) {
 	var _type string
 	var subType string
 
-	s.document.Find(".headertemplate").Each(func(i int, table *goquery.Selection) {
+	tables := s.document.Find(".headertemplate")
+
+	if tables.Length() == 0 {
+		return nil, errors.New(fmt.Sprintf("could not scrape, no tables found for class: %s", s.class))
+	}
+
+	tables.Each(func(i int, table *goquery.Selection) {
 		previousNode := table.Prev()
 		prvNodeName := goquery.NodeName(previousNode)
 
+		// The checks below are horrible. I am well aware.
+		// Gotta do this nasty bit to get data reliably...
+
+		// A title
 		if prvNodeName == "h2" && goquery.NodeName(previousNode.Children().First()) == "span" {
 			tempType := previousNode.Text()
 
+			// Reset subType when moving to another type.
 			if tempType != _type {
 				subType = ""
 			}
 
 			_type = tempType
-		} else if prvNodeName == "h3" {
+		} else if prvNodeName == "h3" { // A subtitle
+
+			// There is usually a h2 before a h3
 			beforeThatElement := previousNode.Prev()
 			if goquery.NodeName(beforeThatElement) == "h2" {
 				_type = beforeThatElement.Text()
 			}
 
 			subType = strings.TrimSpace(previousNode.Text())
-		} else if prvNodeName == "div" {
+		} else if prvNodeName == "div" { // Text below a subtitle is just a div??
+			// Move up 2 elements to get the right text.
 			beforeThatElement := previousNode.Prev().Prev()
 
 			if goquery.NodeName(beforeThatElement) == "h2" {
@@ -90,23 +104,34 @@ func (s Scraper) Run() ([]responses.Response, error) {
 			subType = strings.TrimSpace(previousNode.Prev().Text())
 		}
 
+		// Remove "responses" from texts such as "Objective-related responses".
 		_type = strings.TrimSpace(strings.ReplaceAll(_type, "responses", ""))
+		subType = strings.TrimSpace(strings.ReplaceAll(subType, "responses", ""))
 
 		context := table.Find("td > b").Text()
 
 		var condition string
 
 		table.Children().Find("li").Each(func(i int, listElement *goquery.Selection) {
-			conditionElement := listElement.Find("ul")
+			conditionElement := listElement.Find("ul") // The condition is sometimes a parent list of sorts.
+			otherConditionElement := listElement.Parent().Prev() // The condition can also be just a random paragraph it seems. Nice consistency you got there wiki.
+
+			if goquery.NodeName(otherConditionElement) == "p" {
+				cond := strings.TrimSpace(otherConditionElement.Text())
+
+				// Ignore notes.
+				if !strings.Contains(cond, "Note:") {
+					condition = strings.TrimSuffix(cond, `'`) // Some thingies end with a single quote for some reason.
+				}
+			}
 
 			if conditionElement.Length() == 1 {
-				tempCondition := strings.TrimSpace(listElement.Contents().Not("ul").Text())
+				condition = strings.TrimSpace(listElement.Contents().Not("ul").Text())
+				return
+			}
 
-				if tempCondition == "Rare" {
-					context = context + " (" + tempCondition + ")"
-				} else {
-					condition = tempCondition
-				}
+			if goquery.NodeName(conditionElement.Prev()) == "p" {
+				condition = strings.TrimSpace(conditionElement.Prev().Contents().Not("ul").Text())
 				return
 			}
 
@@ -116,7 +141,7 @@ func (s Scraper) Run() ([]responses.Response, error) {
 
 			responseSlice = append(responseSlice, responses.Response{
 				Class:     s.class,
-				Response:  response,
+				Response:  strings.TrimSpace(response),
 				AudioFile: BaseUrl + audioURI,
 				Type:      _type,
 				SubType:   subType,

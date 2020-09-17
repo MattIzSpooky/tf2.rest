@@ -31,7 +31,7 @@ var {{ .Class }}Responses = []Response{
 		Type: 	   "{{ .Type }}",
 		SubType:   "{{ .SubType }}",
 		Context:   "{{ .Context }}",
-		Condition: "{{ .Condition }}",
+		Condition: ` + "`" + "{{ .Condition }}" + "`"+`,
 	},
 	{{ end }}
 {{- end }}

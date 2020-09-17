@@ -26,9 +26,9 @@ var ALL []Response
 
 func Setup() {
 	// Attack classes
-	//ALL = append(ALL, scoutResponses...)
+	ALL = append(ALL, scoutResponses...)
 	ALL = append(ALL, soldierResponses...)
-	//ALL = append(ALL, pyroResponses...)
+	ALL = append(ALL, pyroResponses...)
 
 	// Defense classes
 	ALL = append(ALL, demomanResponses...)
