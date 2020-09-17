@@ -1,0 +1,17 @@
+version: '3'
+services:
+  tf2-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tf2-api
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    tty: true
+    networks:
+      - tf2-network
+
+networks:
+  tf2-network:
+    driver: bridge

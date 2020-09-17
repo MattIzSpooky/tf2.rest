@@ -4,10 +4,10 @@ type Response struct {
 	Class     string `json:"class"`
 	Response  string `json:"Response"`
 	AudioFile string `json:"audioFile"`
-	Type      string `json:"type"`      // example: Kill-related responses
-	SubType	  string `json:"subType"` 	// example: Payload-related responses
-	Context   string `json:"context"`   // example: Destroying a building
-	Condition string `json:"condition"` // example: Melee killing a Heavy
+	Type      string `json:"type"`                // example: Kill-related responses
+	SubType   string `json:"subType,omitempty"`   // example: Payload-related responses
+	Context   string `json:"context,omitempty"`   // example: Destroying a building
+	Condition string `json:"condition,omitempty"` // example: Melee killing a Heavy
 }
 
 const (

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/gookit/color"
@@ -22,9 +23,22 @@ type Server struct {
 
 // NewServer creates an instance of Server
 func NewServer() *Server {
+	var fullAddress string
+	port :=  os.Getenv("PORT")
+
+	if port == "" {
+		port = "8080"
+	}
+
+	if runtime.GOOS != "windows" {
+		fullAddress = fmt.Sprintf(":%s", port)
+	} else {
+		fullAddress = fmt.Sprintf("%s:%s", "localhost", port)
+	}
+
 	server := &Server{
 		Server: http.Server{
-			Addr:         fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT")),
+			Addr:        fullAddress,
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 10 * time.Second,
 			IdleTimeout:  15 * time.Second,
@@ -57,7 +71,17 @@ func jsonMiddleware(next http.Handler) http.Handler {
 
 // Serve makes our endpoints available
 func (s *Server) Serve() error {
-	s.infoLogger.Println(fmt.Sprintf("Running HTTP server on: http://%s", s.Addr))
+	var runLogLine string
+	const runStringTemplate = "Running HTTP server on: http://%s"
+
+	if runtime.GOOS != "windows" {
+		runLogLine = fmt.Sprintf(runStringTemplate, "localhost" + s.Addr)
+	} else {
+		runLogLine = fmt.Sprintf(runStringTemplate, s.Addr)
+	}
+
+	s.infoLogger.Println(runLogLine)
+
 
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		s.errorLogger.Printf("Could not listen on %s: %v\n", s.Addr, err.Error())

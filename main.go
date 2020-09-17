@@ -7,18 +7,11 @@ import (
 	"syscall"
 
 	"github.com/MattIzSpooky/tf2.rest/server"
-	"github.com/joho/godotenv"
 )
 
 //go:generate go run gen.go
 
 func main() {
-	err := godotenv.Load()
-
-	if err != nil {
-		panic(err)
-	}
-
 	responses.Setup()
 
 	sigChan := make(chan os.Signal, 1)
