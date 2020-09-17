@@ -5,6 +5,7 @@ type Response struct {
 	Response  string `json:"Response"`
 	AudioFile string `json:"audioFile"`
 	Type      string `json:"type"`      // example: Kill-related responses
+	SubType	  string `json:"subType"` 	// example: Payload-related responses
 	Context   string `json:"context"`   // example: Destroying a building
 	Condition string `json:"condition"` // example: Melee killing a Heavy
 }
@@ -25,9 +26,9 @@ var ALL []Response
 
 func Setup() {
 	// Attack classes
-	ALL = append(ALL, scoutResponses...)
+	//ALL = append(ALL, scoutResponses...)
 	ALL = append(ALL, soldierResponses...)
-	ALL = append(ALL, pyroResponses...)
+	//ALL = append(ALL, pyroResponses...)
 
 	// Defense classes
 	ALL = append(ALL, demomanResponses...)

@@ -34,10 +34,12 @@ var {{ .Class }}Responses = []Response{
 {{- with .Responses }}
 	{{ range . }}
 	{
-		Class: {{ .Class | ToUpper }},
-		Response: "{{ .Response }}",
+		Class: 		{{ .Class | ToUpper }},
+		Response:  "{{ .Response }}",
 		AudioFile: "{{ .AudioFile }}",
-		Context: "{{ .Context }}",
+		Type: 	   "{{ .Type }}",
+		SubType:   "{{ .SubType }}",
+		Context:   "{{ .Context }}",
 		Condition: "{{ .Condition }}",
 	},
 	{{ end }}
@@ -76,54 +78,92 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		_type := document.Find("#Kill-related_responses").Text()
-
-		table := document.Find(".headertemplate").First()
-		context := table.Find("#mw-content-text > table:nth-child(8) > tbody > tr:nth-child(1) > td > b").Text()
-
 		var responseSlice []responses.Response
-		var condition string
+		var _type string
+		var subType string
 
-		table.Children().Find("li").Each(func(i int, selection *goquery.Selection) {
-			hasCondition := selection.Find("ul")
+		document.Find(".headertemplate").Each(func(i int, table *goquery.Selection) {
+			previousNode := table.Prev()
+			prvNodeName := goquery.NodeName(previousNode)
 
-			// Condition is found
-			if (hasCondition.Length() == 1) {
-				condition = strings.TrimSpace(selection.Contents().Not("ul").Text())
-				return
+			if prvNodeName == "h2" && goquery.NodeName(previousNode.Children().First()) == "span" {
+				tempType := previousNode.Text()
+
+				if tempType != _type {
+					subType = ""
+				}
+
+				_type = tempType
+			} else if prvNodeName == "h3" {
+				beforeThatElement := previousNode.Prev()
+				if (goquery.NodeName(beforeThatElement) == "h2") {
+					_type = beforeThatElement.Text()
+				}
+
+				subType = strings.TrimSpace(previousNode.Text())
+			} else if (prvNodeName == "div") {
+				beforeThatElement := previousNode.Prev().Prev()
+				if (goquery.NodeName(beforeThatElement) == "h2") {
+					_type = beforeThatElement.Text()
+				}
+				subType = strings.TrimSpace(previousNode.Prev().Text())
 			}
 
-			response := strings.ReplaceAll(selection.Text(), `"`, ``)
+			_type = strings.TrimSpace(strings.ReplaceAll(_type, "responses", ""))
 
-			audioURI, _ := selection.Children().First().Attr("href")
+			fmt.Println(_type)
+			context := table.Find("td > b").Text()
 
-			responseSlice = append(responseSlice, responses.Response{
-				Class:     class,
-				Response:  response,
-				AudioFile: baseUrl + audioURI,
-				Type:      _type,
-				Context:   context,
-				Condition: condition,
+			var condition string
+
+			table.Children().Find("li").Each(func(i int, listElement *goquery.Selection) {
+				hasCondition := listElement.Find("ul")
+
+				// Condition is found
+				if (hasCondition.Length() == 1) {
+					tempCondition := strings.TrimSpace(listElement.Contents().Not("ul").Text())
+
+					if tempCondition == "Rare" {
+						context = context + " (" + tempCondition + ")"
+					} else {
+						condition = tempCondition
+					}
+					return
+				}
+
+				response := strings.ReplaceAll(listElement.Text(), `"`, ``)
+
+				audioURI, _ := listElement.Children().First().Attr("href")
+
+				responseSlice = append(responseSlice, responses.Response{
+					Class:     class,
+					Response:  response,
+					AudioFile: baseUrl + audioURI,
+					Type:      _type,
+					SubType:   subType,
+					Context:   context,
+					Condition: condition,
+				})
 			})
-		})
 
-		f, err := os.Create(fmt.Sprintf("responses/%s.go", class))
+			f, err := os.Create(fmt.Sprintf("responses/%s.go", class))
 
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
+			if err != nil {
+				panic(err)
+			}
+			defer f.Close()
 
-		responseTemplate.Execute(f, struct {
-			Timestamp time.Time
-			URL       string
-			Responses []responses.Response
-			Class     string
-		}{
-			Timestamp: time.Now(),
-			URL:       responsePageUrl,
-			Responses: responseSlice,
-			Class:     class,
+			responseTemplate.Execute(f, struct {
+				Timestamp time.Time
+				URL       string
+				Responses []responses.Response
+				Class     string
+			}{
+				Timestamp: time.Now(),
+				URL:       responsePageUrl,
+				Responses: responseSlice,
+				Class:     class,
+			})
 		})
 
 		fmt.Println(fmt.Sprintf("Generated responses for: %s", class))
