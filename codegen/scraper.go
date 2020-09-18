@@ -3,9 +3,11 @@ package codegen
 import (
 	"errors"
 	"fmt"
+	"github.com/MattIzSpooky/tf2.rest/class"
 	"github.com/MattIzSpooky/tf2.rest/responses"
 	"github.com/PuerkitoBio/goquery"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -137,6 +139,10 @@ func (s Scraper) Run() ([]responses.Response, error) {
 
 			response := strings.ReplaceAll(listElement.Text(), `"`, ``)
 
+			if s.class == class.PYRO {
+				response = cleanPyroResponse(response)
+			}
+
 			audioURI, _ := listElement.Children().First().Attr("href")
 
 			responseSlice = append(responseSlice, responses.Response{
@@ -156,4 +162,12 @@ func (s Scraper) Run() ([]responses.Response, error) {
 	}
 
 	return responseSlice, nil
+}
+
+var pyroRegex = regexp.MustCompile(`\((.*?)\)`)
+
+// https://github.com/MattIzSpooky/tf2.rest/issues/13
+// The pyro quotes have "possible translations" but not all of them are annotated so we're gonna remove all that extra stuff.
+func cleanPyroResponse(response string) string {
+	return pyroRegex.ReplaceAllString(response, "")
 }
