@@ -2,7 +2,7 @@ package responses
 
 type Response struct {
 	Class     string `json:"class"`
-	Response  string `json:"Response"`
+	Response  string `json:"response"`
 	AudioFile string `json:"audioFile"`
 	Type      string `json:"type"`                // example: Kill-related responses
 	SubType   string `json:"subType,omitempty"`   // example: Payload-related responses
@@ -10,33 +10,33 @@ type Response struct {
 	Condition string `json:"condition,omitempty"` // example: Melee killing a Heavy
 }
 
-const (
-	SCOUT    = "scout"
-	SOLDIER  = "soldier"
-	PYRO     = "pyro"
-	DEMOMAN  = "demoman"
-	HEAVY    = "heavy"
-	ENGINEER = "engineer"
-	MEDIC    = "medic"
-	SNIPER   = "sniper"
-	SPY      = "spy"
-)
-
-var ALL []Response
+var All []Response
 
 func Setup() {
 	// Attack classes
-	ALL = append(ALL, scoutResponses...)
-	ALL = append(ALL, soldierResponses...)
-	ALL = append(ALL, pyroResponses...)
+	All = append(All, scoutResponses...)
+	All = append(All, soldierResponses...)
+	All = append(All, pyroResponses...)
 
 	// Defense classes
-	ALL = append(ALL, demomanResponses...)
-	ALL = append(ALL, heavyResponses...)
-	ALL = append(ALL, engineerResponses...)
+	All = append(All, demomanResponses...)
+	All = append(All, heavyResponses...)
+	All = append(All, engineerResponses...)
 
 	// Support classes
-	ALL = append(ALL, medicResponses...)
-	ALL = append(ALL, sniperResponses...)
-	ALL = append(ALL, spyResponses...)
+	All = append(All, medicResponses...)
+	All = append(All, sniperResponses...)
+	All = append(All, spyResponses...)
+}
+
+func FilterByClass(class string) []Response {
+	var responses []Response
+
+	for _, value := range All {
+		if value.Class == class {
+			responses = append(responses, value)
+		}
+	}
+
+	return responses
 }

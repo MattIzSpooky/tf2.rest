@@ -56,7 +56,8 @@ func NewServer() *Server {
 func (s *Server) addHandlers() {
 	mux := &http.ServeMux{}
 
-	mux.Handle("/", jsonMiddleware(http.HandlerFunc(s.randomQuoteHandler)))
+	mux.Handle(randomResponseRoute, jsonMiddleware(http.HandlerFunc(s.randomResponseHandler)))
+	mux.Handle(byClassRoute,  jsonMiddleware(http.HandlerFunc(s.randomByClassHandler)))
 
 	s.Handler = cors.Default().Handler(mux)
 }
