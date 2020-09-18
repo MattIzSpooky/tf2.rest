@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const byClassRoute = randomResponseRoute + "/by-class/"
+const byClassRoute = rootRoute + "by-class/"
 
 func (s *Server) randomByClassHandler(w http.ResponseWriter, r *http.Request) {
 	classFromReq := strings.TrimPrefix(r.URL.Path, byClassRoute)

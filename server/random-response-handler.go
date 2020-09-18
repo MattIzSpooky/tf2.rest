@@ -9,7 +9,6 @@ import (
 	"github.com/MattIzSpooky/tf2.rest/responses"
 )
 
-const randomResponseRoute = "/random"
 
 func (s *Server) randomResponseHandler(w http.ResponseWriter, _ *http.Request) {
 	randomResponse := responses.All[rand.Intn(len(responses.All))]
