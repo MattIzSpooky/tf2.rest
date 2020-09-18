@@ -4,31 +4,21 @@ package main
 
 import (
 	"fmt"
+	classPkg "github.com/MattIzSpooky/tf2.rest/class"
 	"github.com/MattIzSpooky/tf2.rest/codegen"
-	"github.com/MattIzSpooky/tf2.rest/responses"
 	"os"
 	"sync"
 	"time"
 )
 
-var classes = [...]string{
-	responses.SCOUT,
-	responses.SOLDIER,
-	responses.PYRO,
-	responses.DEMOMAN,
-	responses.HEAVY,
-	responses.ENGINEER,
-	responses.MEDIC,
-	responses.SNIPER,
-	responses.SPY,
-}
+
 
 func main() {
 	var wg sync.WaitGroup
 	errChan := make(chan error)
 
 
-	for _, class := range classes {
+	for _, class := range classPkg.Classes {
 		wg.Add(1)
 		go runSingle(class, &wg, errChan)
 	}
@@ -70,7 +60,7 @@ func runSingle(class string, wg *sync.WaitGroup, errChan chan<- error) {
 		return
 	}
 
-	err = tmpl.Execute(f, codegen.ResponseTemplate{
+	err = tmpl.Execute(f, codegen.ResponseTemplateData{
 		Timestamp: time.Now(),
 		URL:       scraper.GetURL(),
 		Responses: rspSlice,

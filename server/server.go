@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gookit/color"
-	"github.com/rs/cors"
 )
 
 // Server is our server object. A normal Server object with a logger attached to it.
@@ -24,7 +23,7 @@ type Server struct {
 // NewServer creates an instance of Server
 func NewServer() *Server {
 	var fullAddress string
-	port :=  os.Getenv("PORT")
+	port := os.Getenv("PORT")
 
 	if port == "" {
 		port = "8080"
@@ -38,7 +37,7 @@ func NewServer() *Server {
 
 	server := &Server{
 		Server: http.Server{
-			Addr:        fullAddress,
+			Addr:         fullAddress,
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 10 * time.Second,
 			IdleTimeout:  15 * time.Second,
@@ -53,35 +52,18 @@ func NewServer() *Server {
 	return server
 }
 
-func (s *Server) addHandlers() {
-	mux := &http.ServeMux{}
-
-	mux.Handle("/", jsonMiddleware(http.HandlerFunc(s.randomQuoteHandler)))
-
-	s.Handler = cors.Default().Handler(mux)
-}
-
-func jsonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 // Serve makes our endpoints available
 func (s *Server) Serve() error {
 	var runLogLine string
 	const runStringTemplate = "Running HTTP server on: http://%s"
 
 	if runtime.GOOS != "windows" {
-		runLogLine = fmt.Sprintf(runStringTemplate, "localhost" + s.Addr)
+		runLogLine = fmt.Sprintf(runStringTemplate, "localhost"+s.Addr)
 	} else {
 		runLogLine = fmt.Sprintf(runStringTemplate, s.Addr)
 	}
 
 	s.infoLogger.Println(runLogLine)
-
 
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		s.errorLogger.Printf("Could not listen on %s: %v\n", s.Addr, err.Error())
